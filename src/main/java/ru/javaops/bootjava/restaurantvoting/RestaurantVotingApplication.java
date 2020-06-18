@@ -10,7 +10,7 @@ import ru.javaops.bootjava.restaurantvoting.repository.UserRepository;
 @SpringBootApplication
 @AllArgsConstructor
 public class RestaurantVotingApplication implements ApplicationRunner {
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(RestaurantVotingApplication.class, args);

@@ -40,4 +40,9 @@ public class User extends BaseEntity {
     @Column(name = "role")
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
+
+    @Override
+    public Integer getId() {
+        return null;
+    }
 }
