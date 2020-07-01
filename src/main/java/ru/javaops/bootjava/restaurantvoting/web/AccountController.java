@@ -18,6 +18,8 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
 
+import static ru.javaops.bootjava.restaurantvoting.config.WebSecurityConfig.PASSWORD_ENCODER;
+
 @RestController
 @RequestMapping(value = "/api/account")
 @AllArgsConstructor
@@ -52,6 +54,31 @@ public class AccountController {
         return ResponseEntity.created(uriOfNewResource).body(user);
     }
 
+    @PutMapping(value = "/change", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePass(@Valid @RequestBody User user,
+                           @RequestParam String newPass,
+                           @AuthenticationPrincipal AuthUser authUser) {
+        log.info("updatePass {} on {}", user, newPass);
+
+        String passFromForm = user.getPassword();
+        User oldUser = authUser.getUser();
+        String passAuthUser = oldUser.getPassword();
+
+        if (user.getPassword() != null) {
+            if (PASSWORD_ENCODER.matches(passFromForm, passAuthUser)) {
+                user.setPassword(newPass);
+                user.setRoles(oldUser.getRoles());
+                ValidationUtil.assureIdConsistent(user, oldUser.id());
+                userRepository.save(user);
+            } else {
+                throw new IllegalArgumentException(" confirm Pass must be correct" );
+            }
+        } else {
+            throw new IllegalArgumentException(" confirm Pass must not be empty" );
+        }
+    }
+
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody User user, @AuthenticationPrincipal AuthUser authUser) {
@@ -64,4 +91,6 @@ public class AccountController {
         }
         userRepository.save(user);
     }
+
+
 }
